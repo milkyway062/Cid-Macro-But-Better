@@ -4,6 +4,7 @@
 ## Have click to move `On`
 ## `0.2 Sens` in roblox
 ## Auto-Replay `On` in AV settings
+## Rolbox window *needs* to be the `SMALLEST` size
 
 - This is a heavily edited version of Requim's macro, which was built off of Lox's
 
