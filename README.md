@@ -25,6 +25,7 @@
 ### Known issues
 - Loss counter not needed - Very hard to detect losses with auto play on
 - Webhooks not updated yet - gonna be way simpler
+- Closing chat is incosistant - working on a more consitant method
 - Some users run into Brook Buff lasting too long or not long enough - Fix (Maybe???): <img width="589" height="142" alt="image" src="https://github.com/user-attachments/assets/1ff9720b-7594-4b15-806f-b3acc4cb9368" />
 
 
