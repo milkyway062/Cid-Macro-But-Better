@@ -1,6 +1,9 @@
 # Cid-Macro-But-Better
 
 ## Just double click `run.bat` to start
+## Have click to move `On`
+## `0.2 Sens` in roblox
+## Auto-Replay `On` in AV settings
 
 - This is a heavily edited version of Requim's macro, which was built off of Lox's
 
