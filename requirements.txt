@@ -1,0 +1,7 @@
+pyautogui
+pygetwindow
+requests
+keyboard
+opencv-python
+pillow
+psutil
