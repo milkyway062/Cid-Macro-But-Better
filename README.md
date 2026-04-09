@@ -13,7 +13,7 @@
 
 - Some things may not work as intended, bugs are still possible, I'm somewhat new to python
 - There are still some things to work on
-
+- It *should* work in RDP but it's very hard to get it working consistantly with how its set up because of RDP compression - it should work just fine on your regular desktop
 
 #### Update `0.1`
 - Super Simple GUI
