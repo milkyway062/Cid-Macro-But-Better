@@ -1,3 +1,9 @@
+#### Update `0.5`
+- Refactored codebase into separate modules — main loop stays in Main.py,
+  with webhook, softlock watchdogs, detections, actions, lobby, and other
+  helpers now living in their own files under a core/ folder. No behavior
+  changes, just cleaner code organization.
+
 #### Update `0.4`
 - Fixed Chat - Holy simple fixm I'm just stupid
 
