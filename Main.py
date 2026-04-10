@@ -1033,7 +1033,8 @@ def main_loop():
             prepare_lobby()
             if SHUTDOWN:
                 break
-            lobby_path_cid_raid()
+            if not lobby_path_cid_raid():
+                continue
             if SHUTDOWN:
                 break
 
