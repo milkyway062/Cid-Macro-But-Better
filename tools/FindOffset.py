@@ -16,7 +16,7 @@ if not rb_window:
 
 dx, dy = (rb_window.left, rb_window.top)
 
-IMAGE_PATH = "Images/settings.png"
+IMAGE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Images", "settings.png")
 CONFIDENCE = 0.8
 
 IS_ON = True

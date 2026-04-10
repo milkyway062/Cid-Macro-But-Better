@@ -33,6 +33,9 @@ desktop.ini
 *.suo
 *.user
 
+# Claude Code
+.claude/
+
 # Graphify — local knowledge graph (not for version control)
 graph.json
 graph.html
