@@ -32,7 +32,7 @@
 - Lobby pathing now retries on failure
 
 #### Update `0.35`
-- Fixed lobby path retry - wasnt working after rejoin
+- Fixed lobby path retry - wasnt working after rejoining lobby
 
 ### Known issues
 - Loss counter not needed - Very hard to detect losses with auto play on
