@@ -27,6 +27,10 @@
 - Hopefully Fixed Chat Detection
 - Added Auto Updater
 
+#### Update `0.3`
+- Fixed cancel popup bricking the macro
+- Lobby pathing now retries on failure
+
 ### Known issues
 - Loss counter not needed - Very hard to detect losses with auto play on
 - Webhooks not updated yet - gonna be way simpler

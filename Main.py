@@ -1072,6 +1072,21 @@ def main_loop():
                     confidence=0.6,
                 )
                 if location:
+                    # Final safety check: don't click vote_start if cancel popup is visible
+                    try:
+                        cancel_check = pyautogui.locateOnScreen(
+                            image=_img("ability_in_use.png"),
+                            grayscale=True,
+                            confidence=0.6,
+                        )
+                        if cancel_check:
+                            cx2, cy2 = pyautogui.center(cancel_check)
+                            InputHandler.Click(cx2, cy2, delay=0.1)
+                            logger.info("Cancel popup dismissed — delaying vote_start click")
+                            time.sleep(0.1)
+                            continue
+                    except Exception:
+                        pass
                     cx, cy = pyautogui.center(location)
                     cx += 124  # button is 124px right of image center
                     InputHandler.Click(cx, cy, delay=0.1)
@@ -1101,6 +1116,18 @@ def main_loop():
                 break
             if pyautogui.pixelMatchesColor(725 + dx, 169 + dy, (255, 255, 255), tolerance=30):
                 InputHandler.Click(374 + dx, 474 + dy, 0.1)
+            try:
+                cancel_loc = pyautogui.locateOnScreen(
+                    image=_img("ability_in_use.png"),
+                    grayscale=True,
+                    confidence=0.6,
+                )
+                if cancel_loc:
+                    cx, cy = pyautogui.center(cancel_loc)
+                    InputHandler.Click(cx, cy, delay=0.1)
+                    logger.info("Cancel popup dismissed during spawn wait")
+            except Exception:
+                pass
             time.sleep(0.1)
 
         if SHUTDOWN:
@@ -1113,6 +1140,18 @@ def main_loop():
             if SHUTDOWN or _restart_run.is_set():
                 break
             InputHandler.Click(472 + dx, 127 + dy, 0.1)
+            try:
+                cancel_loc = pyautogui.locateOnScreen(
+                    image=_img("ability_in_use.png"),
+                    grayscale=True,
+                    confidence=0.6,
+                )
+                if cancel_loc:
+                    cx, cy = pyautogui.center(cancel_loc)
+                    InputHandler.Click(cx, cy, delay=0.1)
+                    logger.info("Cancel popup dismissed during spawn confirm wait")
+            except Exception:
+                pass
             time.sleep(0.3)
 
         if SHUTDOWN:
@@ -1511,42 +1550,58 @@ def lobby_path_cid_raid() -> bool:
     except Exception:
         pass
 
-    # Click AreaIcon to open the area selection menu
-    area_icon = _wait_for_image("AreaIcon.png", timeout=10.0, confidence=0.7)
-    if not area_icon:
-        logger.error("lobby_path_cid_raid: AreaIcon not found after lobby confirmed")
+    # From AreaIcon through Ruined City confirmation — retry up to 3 times.
+    # Restarts Roblox if all attempts fail.
+    MAX_ATTEMPTS = 3
+    for attempt in range(1, MAX_ATTEMPTS + 1):
+        if SHUTDOWN:
+            return False
+        logger.info("lobby_path_cid_raid: navigation attempt %d/%d", attempt, MAX_ATTEMPTS)
+
+        # Click AreaIcon to open the area selection menu
+        area_icon = _wait_for_image("AreaIcon.png", timeout=10.0, confidence=0.7)
+        if not area_icon:
+            logger.warning("lobby_path_cid_raid: AreaIcon not found (attempt %d)", attempt)
+            continue
+        cx, cy = pyautogui.center(area_icon)
+        InputHandler.Click(cx, cy, delay=0.1)
+        if not _sleep(.5): return False
+
+        # Click "Raids" in the area menu
+        InputHandler.Click(RAIDS_AREA[0] + dx, RAIDS_AREA[1] + dy, delay=0.1)
+        if not _sleep(2): return False
+
+        # Walk forward then sprint right to the portal
+        if not _key_hold("w", 3):
+            return False
+
+        InputHandler.KeyDown(KEYMAP["d"])
+        InputHandler.KeyDown(KEYMAP["shift"])
+        ok = _sleep(3)
+        InputHandler.KeyUp(KEYMAP["d"])
+        InputHandler.KeyUp(KEYMAP["shift"])
+        if not ok:
+            return False
+
+        # Enter the Ruined City portal
+        InputHandler.Click(CREATE_MATCH[0] + dx, CREATE_MATCH[1] + dy, delay=0.1)
+        if not _sleep(1.5): return False
+
+        # Select Ruined City and Act 2
+        InputHandler.Click(RUINED_CITY_ITEM[0] + dx, RUINED_CITY_ITEM[1] + dy, delay=0.1)
+        if not _sleep(0.5): return False
+        InputHandler.Click(318 + dx, 271 + dy, delay=0.1)
+        if not _sleep(0.5): return False
+
+        # Confirm Ruined City banner is visible
+        if _wait_for_image("ruined_city.png", timeout=3.0, confidence=0.7):
+            logger.info("lobby_path_cid_raid: Ruined City confirmed on attempt %d", attempt)
+            break
+        logger.warning("lobby_path_cid_raid: Ruined City banner not detected (attempt %d/%d)", attempt, MAX_ATTEMPTS)
+    else:
+        logger.error("lobby_path_cid_raid: Ruined City never confirmed — restarting Roblox")
+        auto_rejoin()
         return False
-    cx, cy = pyautogui.center(area_icon)
-    InputHandler.Click(cx, cy, delay=0.1)
-    if not _sleep(.5): return False
-
-    # Click "Raids" in the area menu
-    InputHandler.Click(RAIDS_AREA[0] + dx, RAIDS_AREA[1] + dy, delay=0.1)
-    if not _sleep(2): return False
-
-    # Walk to the Raids portal: w (3s forward) then d+shift (3s right sprint)
-    if not _key_hold("w", 3):
-        return False
-
-    InputHandler.KeyDown(KEYMAP["d"])
-    InputHandler.KeyDown(KEYMAP["shift"])
-    ok = _sleep(3)
-    InputHandler.KeyUp(KEYMAP["d"])
-    InputHandler.KeyUp(KEYMAP["shift"])
-    if not ok:
-        return False
-
-    # Enter the Ruined City portal
-    InputHandler.Click(CREATE_MATCH[0] + dx, CREATE_MATCH[1] + dy, delay=0.1)
-    if not _sleep(1.5): return False
-
-    # Click the "Ruined City" item in the left raid list
-    InputHandler.Click(RUINED_CITY_ITEM[0] + dx, RUINED_CITY_ITEM[1] + dy, delay=0.1)
-    if not _sleep(0.5): return False
-
-    # Click Act 2 (hardcoded — this macro only runs Ruined City Act 2)
-    InputHandler.Click(318 + dx, 271 + dy, delay=0.1)
-    if not _sleep(0.5): return False
 
     # Click (447, 476) — optional cancel/friends-only button (not always present, safe to click blind)
     InputHandler.Click(447 + dx, 476 + dy, delay=0.1)
