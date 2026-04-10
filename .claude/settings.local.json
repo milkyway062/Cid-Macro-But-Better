@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(gh api:*)",
+      "Bash(python -c \"import json,sys; data=json.load\\(sys.stdin\\); [print\\(item['path']\\) for item in data['tree'] if item['type']=='blob']\")",
+      "WebFetch(domain:api.github.com)",
+      "Bash(pip show:*)",
+      "Read(//c/Users/Bhagy/.claude/**)"
+    ]
+  }
+}

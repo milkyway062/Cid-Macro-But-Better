@@ -278,23 +278,9 @@ def send_webhook(run_time: str, win: int, lose: int, task_name: str, img_bytes=N
     return False
 
 
-def _chat_is_open() -> bool:
-    """Return True if the chat panel is open.
-    Panel is transparent when idle but goes opaque on hover. Hover inside the
-    chat bounds (22,102)-(238,209), then check the known dark background pixel."""
-    if not rb_window:
-        return True
-    try:
-        InputHandler.MoveTo(130 + dx, 155 + dy)  # center of chat panel
-        time.sleep(0.2)
-        return pyautogui.pixelMatchesColor(22 + dx, 102 + dy, (60, 55, 56), tolerance=30)
-    except Exception:
-        return True
-
-
 def close_chat_and_objectives():
     """
-    Close objectives UI, then close chat only if it's currently open.
+    Close objectives UI, then double-click the chat button to ensure it closes.
     No-VC coord = (145, 64), VC coord = (202, 64). Objectives = (214, 353).
     """
     if rb_window:
@@ -306,19 +292,9 @@ def close_chat_and_objectives():
     InputHandler.Click(214 + dx, 353 + dy, delay=0.1)
     _sleep(0.3)
     chat_x = 202 if VC_CHAT else 145
-    # Always click once regardless of detection — pixel check can give false negatives
-    InputHandler.Click(chat_x + dx, 64 + dy, delay=0.4)
-    logger.info("Chat close initial click (x=%d)", chat_x)
-    # Then use detection to confirm and retry if still open
-    attempts = 0
-    while _chat_is_open() and attempts < 4:
-        InputHandler.Click(chat_x + dx, 64 + dy, delay=0.4)
-        attempts += 1
-        logger.info("Chat close retry %d", attempts)
-    if not _chat_is_open():
-        logger.info("Chat closed")
-    else:
-        logger.warning("Chat may still be open after %d retries", attempts)
+    InputHandler.Click(chat_x + dx, 64 + dy, delay=0.2)
+    InputHandler.Click(chat_x + dx, 64 + dy, delay=0.2)
+    logger.info("Chat double-clicked (x=%d)", chat_x)
     _sleep(0.5)
 
 

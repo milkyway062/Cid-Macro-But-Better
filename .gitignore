@@ -32,3 +32,9 @@ desktop.ini
 .idea/
 *.suo
 *.user
+
+# Graphify — local knowledge graph (not for version control)
+graph.json
+graph.html
+GRAPH_REPORT.md
+cache/

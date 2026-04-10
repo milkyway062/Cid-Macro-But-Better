@@ -1,0 +1,19 @@
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Binary image assets — no code to extract
+Images/
+
+# Git internals
+.git/
+
+# Claude config
+.claude/
+
+# Virtual environments (if ever added)
+venv/
+.venv/
+env/
