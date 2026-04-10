@@ -7,7 +7,6 @@
       "Bash(python -c \"import json,sys; data=json.load\\(sys.stdin\\); [print\\(item['path']\\) for item in data['tree'] if item['type']=='blob']\")",
       "WebFetch(domain:api.github.com)",
       "Bash(pip show:*)",
-      "Read(//c/Users/Bhagy/.claude/**)",
       "Bash(python -c \"import config; import state; print\\('config + state OK'\\)\")",
       "Bash(python -c \"import webhook; import helpers; print\\('webhook + helpers OK'\\)\")",
       "Bash(python -c \"import detections; import actions; print\\('detections + actions OK'\\)\")",
