@@ -31,6 +31,9 @@
 - Fixed cancel popup bricking the macro
 - Lobby pathing now retries on failure
 
+#### Update `0.35`
+- Fixed lobby path retry - wasnt working after rejoin
+
 ### Known issues
 - Loss counter not needed - Very hard to detect losses with auto play on
 - Webhooks not updated yet - gonna be way simpler
