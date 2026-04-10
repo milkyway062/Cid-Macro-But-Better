@@ -32,10 +32,9 @@
 - Webhooks not updated yet - gonna be way simpler
 - Closing chat is incosistant - working on a more consitant method
 - Some users run into Brook Buff lasting too long or not long enough - Fix (Maybe???): <img width="589" height="142" alt="image" src="https://github.com/user-attachments/assets/1ff9720b-7594-4b15-806f-b3acc4cb9368" />
-
-
 - Some players are getting the problem with Sokura's ability clicking twice and it softlocking - I thought I fixed this but idk anymore.. I added a timer (5 mins) if a run doesn't win or happen at all in that time, the roblox client restarts completely and it goes into the gamemode, hopefully that fixes it.
 <img width="450" height="280" alt="image" src="https://github.com/user-attachments/assets/fcc4c7bd-b989-4cdd-9017-15dfeb9650c2" />
+- If your macro teleports way too fast and goes to the wrong place - change line 1521 from sleep .5 to 1 or 1.5 or whatever works for you
 
 
 
