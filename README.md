@@ -22,6 +22,11 @@
 - Most Softlocks Fixed
 - Many Other Little Things I Can't Remember
 
+#### Update `0.2`
+- Fixed Leaderboard
+- Hopefully Fixed Chat Detection
+- Added Auto Updater
+
 ### Known issues
 - Loss counter not needed - Very hard to detect losses with auto play on
 - Webhooks not updated yet - gonna be way simpler
