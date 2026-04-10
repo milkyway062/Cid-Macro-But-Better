@@ -12,7 +12,10 @@ import ctypes
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import Main
 
-CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
+_APPDATA = os.environ.get("APPDATA", os.path.expanduser("~"))
+_CONFIG_DIR = os.path.join(_APPDATA, "CidMacro")
+os.makedirs(_CONFIG_DIR, exist_ok=True)
+CONFIG_PATH = os.path.join(_CONFIG_DIR, "config.json")
 
 def _load_config() -> dict:
     try:
