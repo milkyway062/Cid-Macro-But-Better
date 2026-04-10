@@ -1,6 +1,6 @@
 {
   "webhook_url": "",
-  "private_server": "21768692868330557785126702085399",
+  "private_server": "",
   "run_timeout": "90",
   "auto_rejoin_runs": "300",
   "vc_chat": true

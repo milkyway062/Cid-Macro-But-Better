@@ -183,7 +183,7 @@ class MacroGUI:
         self._lbl(self.root, "runs  (0 = off)", fg=FG_DIM).grid(row=5, column=4, sticky="w", padx=(0, 8), pady=4)
 
         # ── Row 6: Private server + Join + VC chat ──
-        self._lbl(self.root, "Private server:", fg=FG_DIM).grid(row=6, column=0, sticky="w", **p)
+        self._lbl(self.root, "Private server link:", fg=FG_DIM).grid(row=6, column=0, sticky="w", **p)
         self._ps_var = tk.StringVar(value=state.PRIVATE_SERVER_CODE)
         self._ps_entry = self._entry(self.root, self._ps_var, 30)
         self._ps_entry.grid(row=6, column=1, columnspan=3, sticky="ew", **p)
@@ -333,9 +333,10 @@ class MacroGUI:
         import subprocess
         code = self._ps_var.get().strip()
         if not code:
-            self._status_var.set("no private server code set")
+            self._status_var.set("no private server link set")
             return
-        url = f"roblox://placeId=16146832113&linkCode={code}/"
+        from helpers import extract_ps_link_code
+        url = f"roblox://placeId=16146832113&linkCode={extract_ps_link_code(code)}/"
         try:
             os.startfile(url)
         except Exception:

@@ -79,6 +79,16 @@ def _update_positions():
     state.RESTART_OK_BTN       = (407 + dx, 360 + dy)
 
 
+def extract_ps_link_code(value: str) -> str:
+    """Return the bare link code from a full Roblox private-server URL or a raw code."""
+    from urllib.parse import urlparse, parse_qs
+    parsed = urlparse(value)
+    qs = parse_qs(parsed.query)
+    if "privateServerLinkCode" in qs:
+        return qs["privateServerLinkCode"][0]
+    return value
+
+
 def initialize() -> bool:
     """Find the Roblox window, update coordinates. Returns True on success."""
     state.rb_window = None

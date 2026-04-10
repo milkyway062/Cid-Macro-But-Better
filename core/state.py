@@ -10,7 +10,7 @@ dy = 0
 # =========================
 # Runtime-mutable settings (overwritten by GUI at startup / on change)
 # =========================
-PRIVATE_SERVER_CODE    = "21768692868330557785126702085399"
+PRIVATE_SERVER_CODE    = ""  # paste your full private server link here
 AUTO_REJOIN_AFTER_RUNS = 0       # 0 = disabled
 VC_CHAT                = False   # True = use VC chat coord (202,64) instead of (145,64)
 RUN_TIMEOUT            = 90.0    # max seconds per run before softlock watchdog fires

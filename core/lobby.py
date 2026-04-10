@@ -62,7 +62,7 @@ def _do_roblox_rejoin() -> bool:
             pass
     helpers._sleep(2)
 
-    rejoin_url = f"roblox://placeId=16146832113&linkCode={state.PRIVATE_SERVER_CODE}/"
+    rejoin_url = f"roblox://placeId=16146832113&linkCode={helpers.extract_ps_link_code(state.PRIVATE_SERVER_CODE)}/"
     logger.info("Launching Roblox: %s", rejoin_url)
     subprocess.Popen([roblox_exe, rejoin_url])
 

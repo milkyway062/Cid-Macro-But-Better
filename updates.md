@@ -1,3 +1,6 @@
+#### Update `0.55`
+- Changed PS server code to link
+
 #### Update `0.5`
 - Refactored codebase into separate modules — main loop stays in Main.py,
   with webhook, softlock watchdogs, detections, actions, lobby, and other
