@@ -207,11 +207,18 @@ class MacroGUI:
         # ── Sep ──
         self._sep(8)
 
-        # ── Row 9: Log toggle ──
+        # ── Row 9: Log toggle + Update ──
         self._show_log = tk.BooleanVar(value=False)
         self._chk(self.root, "Show log", self._show_log, self._toggle_log).grid(
             row=9, column=0, sticky="w", **p
         )
+
+        self._update_btn = tk.Button(
+            self.root, text="Check for Updates", command=self._on_update,
+            bg=INDIGO, fg="white", activebackground=INDIGO_A, activeforeground="white",
+            relief="flat", bd=0, cursor="hand2",
+        )
+        self._update_btn.grid(row=9, column=3, columnspan=3, sticky="e", padx=(0, 8), pady=4)
 
         # ── Row 10: Log panel ──
         self._log_frame = tk.Frame(self.root, bg=SURFACE)
@@ -329,6 +336,79 @@ class MacroGUI:
                 subprocess.Popen(["start", url], shell=True)
             except Exception:
                 self._status_var.set("failed to open Roblox")
+
+    # ── Update ────────────────────────────────────────────────
+    def _on_update(self):
+        self._update_btn.config(state="disabled", text="Checking...")
+        self._status_var.set("Checking for updates...")
+        threading.Thread(target=self._run_update, daemon=True).start()
+
+    def _run_update(self):
+        import hashlib
+        import urllib.request
+
+        REPO     = "milkyway062/Cid-Macro-But-Better"
+        BASE_API = f"https://api.github.com/repos/{REPO}"
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        SKIP_FILES = {"config.json"}
+        SKIP_DIRS  = {"__pycache__", ".git"}
+
+        def git_blob_sha(path):
+            try:
+                with open(path, "rb") as f:
+                    data = f.read()
+                return hashlib.sha1(f"blob {len(data)}\0".encode() + data).hexdigest()
+            except FileNotFoundError:
+                return None
+
+        def fetch(url):
+            req = urllib.request.Request(url, headers={"User-Agent": "CidMacro-Updater"})
+            with urllib.request.urlopen(req, timeout=10) as r:
+                return r.read()
+
+        def set_status(msg):
+            self.root.after(0, lambda m=msg: self._status_var.set(m))
+
+        try:
+            repo_info = json.loads(fetch(BASE_API))
+            branch    = repo_info.get("default_branch", "main")
+
+            set_status("Fetching file list...")
+            tree_data = json.loads(fetch(f"{BASE_API}/git/trees/{branch}?recursive=1"))
+
+            to_update = []
+            for item in tree_data.get("tree", []):
+                if item["type"] != "blob":
+                    continue
+                path  = item["path"]
+                parts = path.replace("\\", "/").split("/")
+                if any(p in SKIP_DIRS for p in parts[:-1]):
+                    continue
+                if parts[-1] in SKIP_FILES:
+                    continue
+                local_path = os.path.join(BASE_DIR, *parts)
+                if git_blob_sha(local_path) != item["sha"]:
+                    to_update.append((path, parts))
+
+            if not to_update:
+                set_status("Already up to date!")
+                self.root.after(3000, lambda: self._status_var.set("idle"))
+                return
+
+            for i, (path, parts) in enumerate(to_update):
+                set_status(f"Updating {parts[-1]} ({i + 1}/{len(to_update)})...")
+                data       = fetch(f"https://raw.githubusercontent.com/{REPO}/{branch}/{path}")
+                local_path = os.path.join(BASE_DIR, *parts)
+                os.makedirs(os.path.dirname(local_path) or BASE_DIR, exist_ok=True)
+                with open(local_path, "wb") as f:
+                    f.write(data)
+
+            set_status(f"Updated {len(to_update)} file(s) — restart to apply.")
+
+        except Exception as e:
+            set_status(f"Update failed: {e}")
+        finally:
+            self.root.after(0, lambda: self._update_btn.config(state="normal", text="Check for Updates"))
 
     def _toggle_log(self):
         if self._show_log.get():

@@ -297,20 +297,28 @@ def close_chat_and_objectives():
     Close objectives UI, then close chat only if it's currently open.
     No-VC coord = (145, 64), VC coord = (202, 64). Objectives = (214, 353).
     """
+    if rb_window:
+        try:
+            rb_window.activate()
+        except Exception:
+            pass
+        _sleep(0.2)
     InputHandler.Click(214 + dx, 353 + dy, delay=0.1)
     _sleep(0.3)
     chat_x = 202 if VC_CHAT else 145
+    # Always click once regardless of detection — pixel check can give false negatives
+    InputHandler.Click(chat_x + dx, 64 + dy, delay=0.4)
+    logger.info("Chat close initial click (x=%d)", chat_x)
+    # Then use detection to confirm and retry if still open
     attempts = 0
-    while _chat_is_open() and attempts < 5:
+    while _chat_is_open() and attempts < 4:
         InputHandler.Click(chat_x + dx, 64 + dy, delay=0.4)
         attempts += 1
-        logger.info("Chat close attempt %d", attempts)
-    if attempts == 0:
-        logger.info("Chat already closed, skipping click")
-    elif not _chat_is_open():
-        logger.info("Chat closed after %d click(s)", attempts)
+        logger.info("Chat close retry %d", attempts)
+    if not _chat_is_open():
+        logger.info("Chat closed")
     else:
-        logger.warning("Chat still open after %d attempts", attempts)
+        logger.warning("Chat may still be open after %d retries", attempts)
     _sleep(0.5)
 
 
@@ -520,11 +528,9 @@ def _do_roblox_rejoin() -> bool:
                 dx, dy = rb_window.left, rb_window.top
                 _update_positions()
 
-            # Dismiss leaderboard if open (check both variants AIO uses)
-            if (_wait_for_image("Leaderboard_Check.png", timeout=1.0, confidence=0.8)
-                    or _wait_for_image("LB_Check2.png", timeout=1.0, confidence=0.8)):
-                pyautogui.press("tab")
-                time.sleep(1)
+            # Dismiss leaderboard (always press Tab — no detection needed)
+            pyautogui.press("tab")
+            time.sleep(1)
 
             return True
 
@@ -1136,6 +1142,9 @@ def main_loop():
             break
 
         if not positioned:
+            # Close leaderboard before positioning (Tab is safe even if already closed)
+            pyautogui.press("tab")
+            _sleep(0.5)
             auto_positioner("Cid_Raid", just_camera=True)
             positioned = True
             if SHUTDOWN:
@@ -1446,15 +1455,11 @@ def prepare_lobby() -> bool:
         if not _sleep(0.5):
             return False
 
-    # Close leaderboard tab if present
-    try:
-        if pyautogui.pixelMatchesColor(642 + dx, 115 + dy, (44, 37, 68), tolerance=10):
-            logger.info("prepare_lobby: closing leaderboard")
-            InputHandler.Click(642 + dx, 115 + dy, delay=0.1)
-            if not _sleep(0.5):
-                return False
-    except Exception:
-        pass
+    # Close leaderboard tab (always click — no detection needed)
+    logger.info("prepare_lobby: closing leaderboard")
+    InputHandler.Click(642 + dx, 115 + dy, delay=0.1)
+    if not _sleep(0.5):
+        return False
 
     return True
 
