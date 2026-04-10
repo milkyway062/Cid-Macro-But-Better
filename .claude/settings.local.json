@@ -7,7 +7,18 @@
       "Bash(python -c \"import json,sys; data=json.load\\(sys.stdin\\); [print\\(item['path']\\) for item in data['tree'] if item['type']=='blob']\")",
       "WebFetch(domain:api.github.com)",
       "Bash(pip show:*)",
-      "Read(//c/Users/Bhagy/.claude/**)"
+      "Read(//c/Users/Bhagy/.claude/**)",
+      "Bash(python -c \"import config; import state; print\\('config + state OK'\\)\")",
+      "Bash(python -c \"import webhook; import helpers; print\\('webhook + helpers OK'\\)\")",
+      "Bash(python -c \"import detections; import actions; print\\('detections + actions OK'\\)\")",
+      "Bash(python -c \"import lobby; import watchdogs; import softlocks; print\\('lobby + watchdogs + softlocks OK'\\)\")",
+      "Bash(py -c \"import lobby; import watchdogs; import softlocks; print\\('lobby + watchdogs + softlocks OK'\\)\")",
+      "Bash(py -c \"import Main; print\\('Main OK'\\)\")",
+      "Bash(py -c \"import Main; print\\('Final check OK'\\)\")",
+      "Bash(mkdir -p core)",
+      "Bash(mv config.py state.py webhook.py helpers.py detections.py actions.py lobby.py watchdogs.py softlocks.py core/)",
+      "Bash(py -c \"import gui; print\\('gui OK'\\)\")",
+      "Bash(ls -1 *.py)"
     ]
   }
 }

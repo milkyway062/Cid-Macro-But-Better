@@ -9,8 +9,12 @@ import json
 import keyboard
 import ctypes
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+_here = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, _here)
+sys.path.insert(0, os.path.join(_here, "core"))
 import Main
+import state
+import softlocks
 
 _APPDATA = os.environ.get("APPDATA", os.path.expanduser("~"))
 _CONFIG_DIR = os.path.join(_APPDATA, "CidMacro")
@@ -163,14 +167,14 @@ class MacroGUI:
 
         # ── Row 5: Timeout + Rejoin ──
         self._lbl(self.root, "Timeout (s):", fg=FG_DIM).grid(row=5, column=0, sticky="w", **p)
-        self._timeout_var = tk.StringVar(value=str(int(Main.RUN_TIMEOUT)))
+        self._timeout_var = tk.StringVar(value=str(int(state.RUN_TIMEOUT)))
         self._timeout_entry = self._entry(self.root, self._timeout_var, 6)
         self._timeout_entry.grid(row=5, column=1, sticky="w", **p)
         self._timeout_entry.bind("<Return>", self._apply_timeout)
         self._timeout_entry.bind("<FocusOut>", self._apply_timeout)
 
         self._lbl(self.root, "Rejoin after:", fg=FG_DIM).grid(row=5, column=2, sticky="w", **p)
-        self._rejoin_var = tk.StringVar(value=str(Main.AUTO_REJOIN_AFTER_RUNS))
+        self._rejoin_var = tk.StringVar(value=str(state.AUTO_REJOIN_AFTER_RUNS))
         self._rejoin_entry = self._entry(self.root, self._rejoin_var, 6)
         self._rejoin_entry.grid(row=5, column=3, sticky="w", **p)
         self._rejoin_entry.bind("<Return>", self._apply_rejoin)
@@ -180,7 +184,7 @@ class MacroGUI:
 
         # ── Row 6: Private server + Join + VC chat ──
         self._lbl(self.root, "Private server:", fg=FG_DIM).grid(row=6, column=0, sticky="w", **p)
-        self._ps_var = tk.StringVar(value=Main.PRIVATE_SERVER_CODE)
+        self._ps_var = tk.StringVar(value=state.PRIVATE_SERVER_CODE)
         self._ps_entry = self._entry(self.root, self._ps_var, 30)
         self._ps_entry.grid(row=6, column=1, columnspan=3, sticky="ew", **p)
         self._ps_entry.bind("<FocusOut>", self._apply_private_server)
@@ -192,7 +196,7 @@ class MacroGUI:
             relief="flat", bd=0, cursor="hand2",
         ).grid(row=6, column=4, sticky="w", **p)
 
-        self._vc_chat_var = tk.BooleanVar(value=Main.VC_CHAT)
+        self._vc_chat_var = tk.BooleanVar(value=state.VC_CHAT)
         self._chk(self.root, "VC chat", self._vc_chat_var, self._apply_vc_chat).grid(
             row=6, column=5, sticky="w", padx=(4, 8), pady=4
         )
@@ -200,8 +204,8 @@ class MacroGUI:
         # ── Row 7: Webhook ──
         self._lbl(self.root, "Webhook URL:", fg=FG_DIM).grid(row=7, column=0, sticky="w", **p)
         self._wh_var = tk.StringVar()
-        if Main.WEBHOOK_URL.startswith("https://"):
-            self._wh_var.set(Main.WEBHOOK_URL)
+        if state.WEBHOOK_URL.startswith("https://"):
+            self._wh_var.set(state.WEBHOOK_URL)
         self._wh_entry = self._entry(self.root, self._wh_var, 48)
         self._wh_entry.grid(row=7, column=1, columnspan=5, sticky="ew", **p)
         self._wh_entry.bind("<FocusOut>", lambda _: self._save())
@@ -244,22 +248,22 @@ class MacroGUI:
         cfg = self._cfg
         if "webhook_url" in cfg:
             self._wh_var.set(cfg["webhook_url"])
-            Main.WEBHOOK_URL = cfg["webhook_url"]
+            state.WEBHOOK_URL = cfg["webhook_url"]
         if "private_server" in cfg:
             self._ps_var.set(cfg["private_server"])
-            Main.PRIVATE_SERVER_CODE = cfg["private_server"]
+            state.PRIVATE_SERVER_CODE = cfg["private_server"]
         if "run_timeout" in cfg:
             val = max(10.0, min(600.0, float(cfg["run_timeout"])))
             self._timeout_var.set(str(int(val)))
-            Main.RUN_TIMEOUT = val
-            Main.state["run_timeout"] = val
+            state.RUN_TIMEOUT = val
+            state.state["run_timeout"] = val
         if "auto_rejoin_runs" in cfg:
             val = max(0, min(1000, int(cfg["auto_rejoin_runs"])))
             self._rejoin_var.set(str(val))
-            Main.AUTO_REJOIN_AFTER_RUNS = val
+            state.AUTO_REJOIN_AFTER_RUNS = val
         if "vc_chat" in cfg:
             self._vc_chat_var.set(bool(cfg["vc_chat"]))
-            Main.VC_CHAT = bool(cfg["vc_chat"])
+            state.VC_CHAT = bool(cfg["vc_chat"])
 
     def _save(self):
         _save_config({
@@ -272,8 +276,8 @@ class MacroGUI:
 
     # ── Callbacks ─────────────────────────────────────────────
     def _on_start(self):
-        Main.WEBHOOK_URL = self._wh_var.get().strip()
-        Main.PRIVATE_SERVER_CODE = self._ps_var.get().strip()
+        state.WEBHOOK_URL = self._wh_var.get().strip()
+        state.PRIVATE_SERVER_CODE = self._ps_var.get().strip()
         self._save()
         ok = Main.start()
         if ok:
@@ -286,7 +290,7 @@ class MacroGUI:
 
     def _on_stop(self):
         Main.stop()
-        Main._restart_run.set()
+        state._restart_run.set()
         self._stop_btn.config(state="disabled")
         self._status_var.set("stopping\u2026")
         self._stopping = True
@@ -294,35 +298,35 @@ class MacroGUI:
     def _apply_timeout(self, _event=None):
         try:
             val = max(10.0, min(600.0, float(self._timeout_var.get())))
-            Main.RUN_TIMEOUT = val
-            Main.state["run_timeout"] = val
+            state.RUN_TIMEOUT = val
+            state.state["run_timeout"] = val
             self._timeout_var.set(str(int(val)))
             self._timeout_entry.config(bg=ENTRY)
             self._save()
         except ValueError:
             self._timeout_entry.config(bg=ERR_BG)
             self.root.after(800, lambda: self._timeout_entry.config(bg=ENTRY))
-            self._timeout_var.set(str(int(Main.RUN_TIMEOUT)))
+            self._timeout_var.set(str(int(state.RUN_TIMEOUT)))
 
     def _apply_rejoin(self, _event=None):
         try:
             val = max(0, min(1000, int(self._rejoin_var.get())))
-            Main.AUTO_REJOIN_AFTER_RUNS = val
+            state.AUTO_REJOIN_AFTER_RUNS = val
             self._rejoin_var.set(str(val))
             self._rejoin_entry.config(bg=ENTRY)
             self._save()
         except ValueError:
             self._rejoin_entry.config(bg=ERR_BG)
             self.root.after(800, lambda: self._rejoin_entry.config(bg=ENTRY))
-            self._rejoin_var.set(str(Main.AUTO_REJOIN_AFTER_RUNS))
+            self._rejoin_var.set(str(state.AUTO_REJOIN_AFTER_RUNS))
 
     def _apply_private_server(self, _event=None):
-        Main.PRIVATE_SERVER_CODE = self._ps_var.get().strip()
+        state.PRIVATE_SERVER_CODE = self._ps_var.get().strip()
         self._ps_entry.config(bg=ENTRY)
         self._save()
 
     def _apply_vc_chat(self):
-        Main.VC_CHAT = self._vc_chat_var.get()
+        state.VC_CHAT = self._vc_chat_var.get()
         self._save()
 
     def _on_join_ps(self):
@@ -427,7 +431,7 @@ class MacroGUI:
         return f"{s//3600:02d}:{(s%3600)//60:02d}:{s%60:02d}"
 
     def _tick(self):
-        st = Main.state
+        st = state.state
         self._runs_var.set(f"Runs: {st['wins'] + st['losses']}")
         self._wins_var.set(f"Wins: {st['wins']}")
         self._loss_var.set(f"Losses: {st['losses']}")
@@ -442,7 +446,7 @@ class MacroGUI:
         elif not st["running"]:
             self._run_time_lbl.config(fg=FG)
 
-        if Main._macro_thread and not Main._macro_thread.is_alive():
+        if state._macro_thread and not state._macro_thread.is_alive():
             if self._status_var.get() in ("running", "stopping\u2026"):
                 self._start_btn.config(state="normal")
                 self._stop_btn.config(state="disabled")
@@ -468,8 +472,8 @@ class MacroGUI:
     def _on_close(self):
         self._save()
         Main.stop()
-        if Main._macro_thread and Main._macro_thread.is_alive():
-            Main._macro_thread.join(timeout=2.0)
+        if state._macro_thread and state._macro_thread.is_alive():
+            state._macro_thread.join(timeout=2.0)
         self.root.destroy()
 
 
@@ -495,8 +499,8 @@ def main():
         _r.destroy()
         sys.exit(1)
 
-    threading.Thread(target=Main.softlock_watchdog, daemon=True).start()
-    threading.Thread(target=Main.global_rejoin_watchdog, daemon=True).start()
+    threading.Thread(target=softlocks.softlock_watchdog,    daemon=True).start()
+    threading.Thread(target=softlocks.global_rejoin_watchdog, daemon=True).start()
     root = tk.Tk()
     MacroGUI(root)
     root.mainloop()
