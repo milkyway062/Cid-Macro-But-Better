@@ -325,7 +325,7 @@ def main_loop():
                 gohan_location = pyautogui.locateOnScreen(
                     image=detections._img("Gohan.png"),
                     grayscale=True,
-                    region=(435 + state.dx, 76 + state.dy, 792, 511),
+                    region=(435 + state.dx, 76 + state.dy, 792 - 435, 511 - 76),
                     confidence=0.75,
                 )
             except Exception:
@@ -421,14 +421,17 @@ def main_loop():
 
         # Match ended — tally win and send webhook
         state.state["wins"] += 1
-        total_elapsed = time.time() - state.state["session_start"]
+        total_elapsed = time.time() - state.state["run_start"]
         run_time_str  = time.strftime("%H:%M:%S", time.gmtime(total_elapsed))
 
         try:
-            screenshot = pyautogui.screenshot(region=(
-                state.rb_window.left, state.rb_window.top,
-                state.rb_window.width, state.rb_window.height,
-            ))
+            if state.rb_window:
+                screenshot = pyautogui.screenshot(region=(
+                    state.rb_window.left, state.rb_window.top,
+                    state.rb_window.width, state.rb_window.height,
+                ))
+            else:
+                screenshot = None
             buf = io.BytesIO()
             screenshot.save(buf, format="PNG")
             img_bytes = buf.getvalue()

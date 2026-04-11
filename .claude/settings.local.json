@@ -18,7 +18,17 @@
       "Bash(mkdir -p core)",
       "Bash(mv config.py state.py webhook.py helpers.py detections.py actions.py lobby.py watchdogs.py softlocks.py core/)",
       "Bash(py -c \"import gui; print\\('gui OK'\\)\")",
-      "Bash(ls -1 *.py)"
+      "Bash(ls -1 *.py)",
+      "Bash(gh repo:*)",
+      "Bash(claude plugin:*)",
+      "Bash(powershell:*)",
+      "Bash(python3 -c \"import json,sys; data=json.load\\(sys.stdin\\); [print\\(f['name'], f['download_url']\\) for f in data]\")",
+      "Bash(claude:*)",
+      "Bash(python3 -m json.tool)",
+      "Bash(python -c \"import graphify\")",
+      "Bash(python3 -c \"import pyautogui; help\\(pyautogui.locateOnScreen\\)\")",
+      "Bash(python3:*)",
+      "Bash(python:*)"
     ]
   }
 }

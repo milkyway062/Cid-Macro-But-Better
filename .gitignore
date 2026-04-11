@@ -37,7 +37,11 @@ desktop.ini
 .claude/
 
 # Graphify — local knowledge graph (not for version control)
+graphify-out/
 graph.json
 graph.html
 GRAPH_REPORT.md
 cache/
+
+# Claude Code project instructions (local only)
+CLAUDE.md

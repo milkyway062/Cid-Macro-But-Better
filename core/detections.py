@@ -72,15 +72,20 @@ def _daily_rewards_visible() -> bool:
 
 
 def dismiss_passive_menu() -> bool:
-    """Detect passive title on screen; if found, click it away."""
+    """Detect passive title on screen; if found, click its center."""
+    if not state.rb_window:
+        return False
+    region = (state.dx, state.dy, state.rb_window.width, state.rb_window.height)
     try:
         location = pyautogui.locateOnScreen(
             image=_img("passive_title.png"),
             grayscale=True,
-            confidence=0.6,
+            confidence=0.75,
+            region=region,
         )
         if location:
-            InputHandler.Click(*state.PASSIVE_MENU_PIXEL, delay=0.1)
+            cx, cy = pyautogui.center(location)
+            InputHandler.Click(cx, cy, delay=0.1)
             logger.info("Passive menu detected and dismissed")
             return True
     except pyautogui.ImageNotFoundException:

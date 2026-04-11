@@ -65,11 +65,13 @@ def popup_watcher():
     logger.info("Popup watcher started")
     while not state.SHUTDOWN:
         try:
-            detections.dismiss_passive_menu()
+            if detections.dismiss_passive_menu():
+                time.sleep(1.5)  # cooldown — let menu fully close before rechecking
+                continue
             detections.dismiss_cancel_button()
         except Exception:
             logger.exception("popup_watcher error")
-        time.sleep(0.1)
+        time.sleep(0.5)
 
 
 def disconnect_checker():
