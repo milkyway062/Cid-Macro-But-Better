@@ -2,7 +2,6 @@ import logging
 import time
 import sys
 import os
-import io
 import traceback
 import pyautogui
 from threading import Thread
@@ -420,28 +419,22 @@ def main_loop():
             logger.exception("Error clicking confirmation after ability2")
 
         # Match ended — tally win and send webhook
-        state.state["wins"] += 1
-        total_elapsed = time.time() - state.state["run_start"]
-        run_time_str  = time.strftime("%H:%M:%S", time.gmtime(total_elapsed))
+        state.state["wins"]              += 1
+        state.state["runs_since_rejoin"] += 1
+        total_elapsed   = time.time() - state.state["run_start"]
+        session_elapsed = time.time() - state.state["session_start"]
+        run_time_str    = time.strftime("%H:%M:%S", time.gmtime(total_elapsed))
+        total_time_str  = time.strftime("%H:%M:%S", time.gmtime(session_elapsed))
 
         try:
-            if state.rb_window:
-                screenshot = pyautogui.screenshot(region=(
-                    state.rb_window.left, state.rb_window.top,
-                    state.rb_window.width, state.rb_window.height,
-                ))
-            else:
-                screenshot = None
-            buf = io.BytesIO()
-            screenshot.save(buf, format="PNG")
-            img_bytes = buf.getvalue()
             Thread(
                 target=webhook.send_webhook,
-                args=(run_time_str, state.state["wins"], state.state["losses"], "Cid Macro", img_bytes),
+                args=(run_time_str, total_time_str, state.state["runs"] + 1,
+                      state.state["runs_since_rejoin"]),
                 daemon=True,
             ).start()
         except Exception:
-            logger.exception("Screenshot or webhook thread start failed")
+            logger.exception("Webhook thread start failed")
 
         state.USE_BROOK        = False
         state.state["runs"]   += 1
@@ -485,11 +478,12 @@ def start() -> bool:
         return False
     state.SHUTDOWN              = False
     state.state["running"]      = True
-    state.state["runs"]         = 0
-    state.state["wins"]         = 0
-    state.state["losses"]       = 0
-    state.state["session_start"] = time.time()
-    state.state["run_start"]    = 0.0
+    state.state["runs"]              = 0
+    state.state["wins"]              = 0
+    state.state["losses"]            = 0
+    state.state["runs_since_rejoin"] = 0
+    state.state["session_start"]     = time.time()
+    state.state["run_start"]         = 0.0
 
     Thread(target=watchdogs.disconnect_checker, daemon=True).start()
     Thread(target=watchdogs.boss_watcher,       daemon=True).start()

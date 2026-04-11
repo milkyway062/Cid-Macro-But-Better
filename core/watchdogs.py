@@ -83,7 +83,7 @@ def disconnect_checker():
                 logger.warning("Disconnect detected — rejoining")
                 state._restart_run.set()
                 state._match_active.clear()
-                ok = lobby._do_roblox_rejoin()
+                ok = lobby._do_roblox_rejoin("Disconnect")
                 if ok:
                     logger.info("Rejoin successful, macro will restart run")
                 else:

@@ -14,6 +14,7 @@ import config
 import helpers
 import detections
 import InputHandler
+import webhook
 
 logger = logging.getLogger(__name__)
 
@@ -32,11 +33,20 @@ def get_roblox_exe_path() -> str | None:
     return None
 
 
-def _do_roblox_rejoin() -> bool:
+def _do_roblox_rejoin(reason: str = "Unknown") -> bool:
     """
     Kill Roblox, relaunch into private server, wait for game to load.
     Returns True on success, False on failure.
     """
+    runs_before_reset = state.state["runs_since_rejoin"]
+    state.state["runs_since_rejoin"] = 0
+    from threading import Thread
+    Thread(
+        target=webhook.send_rejoin_webhook,
+        args=(reason, runs_before_reset),
+        daemon=True,
+    ).start()
+
     roblox_exe = get_roblox_exe_path()
     if not roblox_exe:
         logger.error("_do_roblox_rejoin: could not find RobloxPlayerBeta.exe")
@@ -108,7 +118,7 @@ def auto_rejoin() -> bool:
     Called from main_loop when the run threshold is reached.
     """
     logger.info("Auto rejoin: restarting Roblox to reset FPS leaks")
-    ok = _do_roblox_rejoin()
+    ok = _do_roblox_rejoin("Auto-Rejoin")
     if ok:
         logger.info("Auto rejoin complete — continuing macro")
     else:
@@ -252,7 +262,7 @@ def lobby_path_cid_raid() -> bool:
         )
     else:
         logger.error("lobby_path_cid_raid: Ruined City never confirmed — restarting Roblox")
-        auto_rejoin()
+        _do_roblox_rejoin("Lobby Nav Failed")
         return False
 
     InputHandler.Click(447 + state.dx, 476 + state.dy, delay=0.1)

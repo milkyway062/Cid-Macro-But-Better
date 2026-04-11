@@ -21,14 +21,15 @@ WEBHOOK_URL            = ""      # Discord webhook URL (set via GUI)
 # Shared state dict (read by GUI tick loop)
 # =========================
 state = {
-    "runs":           0,
-    "wins":           0,
-    "losses":         0,
-    "session_start":  0.0,
-    "run_start":      0.0,
-    "run_timeout":    90.0,
-    "running":        False,
-    "last_webhook_ok": None,
+    "runs":              0,
+    "wins":              0,
+    "losses":            0,
+    "runs_since_rejoin": 0,
+    "session_start":     0.0,
+    "run_start":         0.0,
+    "run_timeout":       90.0,
+    "running":           False,
+    "last_webhook_ok":   None,
 }
 
 # =========================

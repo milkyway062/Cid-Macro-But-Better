@@ -53,7 +53,7 @@ def global_rejoin_watchdog():
                     state.state["run_start"] = 0.0
                     state.state["runs"]      = 0
                     state._restart_run.set()
-                    lobby._do_roblox_rejoin()
+                    lobby._do_roblox_rejoin("Global Timeout")
             time.sleep(1.0)
         except Exception:
             logger.exception("global_rejoin_watchdog error")
