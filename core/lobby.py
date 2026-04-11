@@ -214,7 +214,7 @@ def lobby_path_cid_raid() -> bool:
             continue
         cx, cy = pyautogui.center(area_icon)
         InputHandler.Click(cx, cy, delay=0.1)
-        if not helpers._sleep(0.5):
+        if not helpers._sleep(1):
             return False
 
         InputHandler.Click(RAIDS_AREA[0] + state.dx, RAIDS_AREA[1] + state.dy, delay=0.1)
