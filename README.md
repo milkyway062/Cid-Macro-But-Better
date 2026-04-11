@@ -1,4 +1,4 @@
-# Cid-Macro-But-Better
+# Cid-Macro-But-Better - Fork Of [CidTutorial by Lox](https://github.com/loxerex/MacroTutorials)
 
 ## Settings
 - Just double click `run.bat` to start
@@ -9,37 +9,23 @@
 - TAKE ALL COSMETICS `OFF`
 - Brook keybinds are `ASDFG`
 
+### Check [updates.md](https://github.com/milkyway062/Cid-Macro-But-Better/blob/main/updates.md) for updates
+
 ## Things to know before using this:
 
 - Some things may not work as intended, bugs are still possible, I'm somewhat new to python
 - There are still some things to work on
 - It *should* work in RDP but it's very hard to get it working consistantly with how its set up because of RDP compression - it should work just fine on your regular desktop
 
-#### Update `0.1`
-- Super Simple GUI
-- Auto Position
-- Auto Rejoin
-- Most Softlocks Fixed
-- Many Other Little Things I Can't Remember
-
-#### Update `0.2`
-- Fixed Leaderboard
-- Hopefully Fixed Chat Detection
-- Added Auto Updater
-
-#### Update `0.3`
-- Fixed cancel popup bricking the macro
-- Lobby pathing now retries on failure
-
-### Known issues
+### Known issues and fixes
 - Loss counter not needed - Very hard to detect losses with auto play on
 - Webhooks not updated yet - gonna be way simpler
-- Closing chat is incosistant - working on a more consitant method
-- Some users run into Brook Buff lasting too long or not long enough - Fix (Maybe???): <img width="589" height="142" alt="image" src="https://github.com/user-attachments/assets/1ff9720b-7594-4b15-806f-b3acc4cb9368" />
-- Some players are getting the problem with Sokura's ability clicking twice and it softlocking - I thought I fixed this but idk anymore.. I added a timer (5 mins) if a run doesn't win or happen at all in that time, the roblox client restarts completely and it goes into the gamemode, hopefully that fixes it.
-<img width="450" height="280" alt="image" src="https://github.com/user-attachments/assets/fcc4c7bd-b989-4cdd-9017-15dfeb9650c2" />
+- Some users run into Brook Buff lasting too long or not long enough - Fix:
+  - The buff loop runs until a wave skip is detected. `The 6 on line 100 in core\actions.py` is the minimum time (in seconds) before it checks for wave skip — effectively how long the buff holds. Change that value to adjust the duration.
+- Some players are getting the problem with Sokura's ability clicking twice and it softlocking - I thought I fixed this but idk anymore.. I added a timer (5 mins) if a run doesn't win or happen at all in that time, the roblox client restarts completely and it goes into the gamemode, hopefully that fixes it. Try this also:
+  - `line 284 in Main.py` — `InputHandler.Click(\*state.ABILITY1, delay=0.1)` — Delay after clicking the ability button.
 
-- If your macro teleports way too fast and goes to the wrong place - change line 1521 from sleep .5 to 1 or 1.5 or whatever works for you
+- If your macro teleports way too fast and goes to the wrong place - Change `line 217 in core\lobby.py` from sleep 1 to 1.5 or 2 or whatever works for you - Values are in seconds
 
 <hr>
 
