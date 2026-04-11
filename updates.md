@@ -1,3 +1,9 @@
+#### Update `0.7`
+- Webhook rework - no need for screenshot anymore, rejoin webhook
+
+#### Update `0.6`
+- Fixed passive menu detection, shouldnt detect to nothing - hopefully works - I havent tested yet
+
 #### Update `0.55`
 - Changed PS server code to link
 - Changed Sakura ability delay from .5 to 1 second for default

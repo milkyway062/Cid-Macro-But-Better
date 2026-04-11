@@ -1,11 +1,12 @@
 # Cid-Macro-But-Better - Fork Of [CidTutorial by Lox](https://github.com/loxerex/MacroTutorials)
 
-## Settings
 - Just double click `run.bat` to start
+
+## Settings
 - Have click to move `On`
 - `0.2 Sens` in roblox
 - Auto-Replay `On` in AV settings
-- Rolbox window *needs* to be the `SMALLEST` size
+- Roblox window *needs* to be the `SMALLEST` size
 - TAKE ALL COSMETICS `OFF`
 - Brook keybinds are `ASDFG`
 
@@ -19,7 +20,6 @@
 
 ### Known issues and fixes
 - Loss counter not needed - Very hard to detect losses with auto play on
-- Webhooks not updated yet - gonna be way simpler
 - Some users run into Brook Buff lasting too long or not long enough - Fix:
   - The buff loop runs until a wave skip is detected. `The 6 on line 100 in core\actions.py` is the minimum time (in seconds) before it checks for wave skip — effectively how long the buff holds. Change that value to adjust the duration.
 - Some players are getting the problem with Sokura's ability clicking twice and it softlocking - I thought I fixed this but idk anymore.. I added a timer (5 mins) if a run doesn't win or happen at all in that time, the roblox client restarts completely and it goes into the gamemode, hopefully that fixes it. Try this also:
