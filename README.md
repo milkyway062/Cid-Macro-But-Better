@@ -1,4 +1,4 @@
-# Cid-Macro-But-Better
+# Cid-Macro-But-Better - Fork Of [CidTutorial by Lox](https://github.com/loxerex/MacroTutorials)
 
 ## Settings
 - Just double click `run.bat` to start
@@ -9,27 +9,13 @@
 - TAKE ALL COSMETICS `OFF`
 - Brook keybinds are `ASDFG`
 
+### Check [updates.md](https://github.com/milkyway062/Cid-Macro-But-Better/blob/main/updates.md) for updates
+
 ## Things to know before using this:
 
 - Some things may not work as intended, bugs are still possible, I'm somewhat new to python
 - There are still some things to work on
 - It *should* work in RDP but it's very hard to get it working consistantly with how its set up because of RDP compression - it should work just fine on your regular desktop
-
-#### Update `0.1`
-- Super Simple GUI
-- Auto Position
-- Auto Rejoin
-- Most Softlocks Fixed
-- Many Other Little Things I Can't Remember
-
-#### Update `0.2`
-- Fixed Leaderboard
-- Hopefully Fixed Chat Detection
-- Added Auto Updater
-
-#### Update `0.3`
-- Fixed cancel popup bricking the macro
-- Lobby pathing now retries on failure
 
 ### Known issues
 - Loss counter not needed - Very hard to detect losses with auto play on
