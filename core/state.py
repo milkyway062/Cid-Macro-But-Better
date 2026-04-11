@@ -22,6 +22,7 @@ WEBHOOK_URL            = ""      # Discord webhook URL (set via GUI)
 # =========================
 state = {
     "runs":              0,
+    "total_runs":        0,
     "wins":              0,
     "losses":            0,
     "runs_since_rejoin": 0,

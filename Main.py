@@ -420,6 +420,7 @@ def main_loop():
 
         # Match ended — tally win and send webhook
         state.state["wins"]              += 1
+        state.state["total_runs"]        += 1
         state.state["runs_since_rejoin"] += 1
         total_elapsed   = time.time() - state.state["run_start"]
         session_elapsed = time.time() - state.state["session_start"]
@@ -429,7 +430,7 @@ def main_loop():
         try:
             Thread(
                 target=webhook.send_webhook,
-                args=(run_time_str, total_time_str, state.state["runs"] + 1,
+                args=(run_time_str, total_time_str, state.state["total_runs"],
                       state.state["runs_since_rejoin"]),
                 daemon=True,
             ).start()
@@ -479,6 +480,7 @@ def start() -> bool:
     state.SHUTDOWN              = False
     state.state["running"]      = True
     state.state["runs"]              = 0
+    state.state["total_runs"]        = 0
     state.state["wins"]              = 0
     state.state["losses"]            = 0
     state.state["runs_since_rejoin"] = 0
