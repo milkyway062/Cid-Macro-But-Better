@@ -1,5 +1,6 @@
 #### Update `0.55`
 - Changed PS server code to link
+- Changed Sakura ability delay from .5 to 1 second for default
 
 #### Update `0.5`
 - Refactored codebase into separate modules — main loop stays in Main.py,
