@@ -1,5 +1,6 @@
 #### Update `0.75`
 - Fixed webhook total count resetting to 0 after rejoin
+- Added total gems count to webhook
 
 #### Update `0.7`
 - Webhook rework - no need for screenshot anymore, rejoin webhook
