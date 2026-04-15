@@ -30,7 +30,11 @@
       "Bash(python3:*)",
       "Bash(python:*)",
       "Bash(git -C \"C:/Users/Bhagy/Desktop/Cid-Macro-But-Better\" diff HEAD --stat)",
-      "Bash(git -C \"C:/Users/Bhagy/Desktop/Cid-Macro-But-Better\" status --short)"
+      "Bash(git -C \"C:/Users/Bhagy/Desktop/Cid-Macro-But-Better\" status --short)",
+      "Bash(node \"C:\\\\Users\\\\Bhagy\\\\.claude\\\\hooks\\\\caveman-activate.js\")",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(where node:*)",
+      "WebSearch"
     ]
   }
 }

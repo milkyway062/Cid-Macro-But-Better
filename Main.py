@@ -19,6 +19,7 @@ import watchdogs
 import softlocks
 import webhook
 import InputHandler
+import cid_act2
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
@@ -488,9 +489,17 @@ def start() -> bool:
     state.state["run_start"]         = 0.0
 
     Thread(target=watchdogs.disconnect_checker, daemon=True).start()
-    Thread(target=watchdogs.boss_watcher,       daemon=True).start()
     Thread(target=watchdogs.popup_watcher,      daemon=True).start()
-    state._macro_thread = Thread(target=main_loop, daemon=True)
+
+    if state.STRATEGY == "cid_act2":
+        logger.info("Starting strategy: Cid Act 2 (team=%d)", state.ACT2_TEAM)
+        # boss_watcher not started — Act 2 handles boss detection inline
+        state._macro_thread = Thread(target=cid_act2.run_loop, daemon=True)
+    else:
+        logger.info("Starting strategy: Cid Raid")
+        Thread(target=watchdogs.boss_watcher, daemon=True).start()
+        state._macro_thread = Thread(target=main_loop, daemon=True)
+
     state._macro_thread.start()
     return True
 

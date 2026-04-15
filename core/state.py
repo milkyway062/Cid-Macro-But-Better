@@ -18,6 +18,14 @@ GLOBAL_REJOIN_TIMEOUT  = 300.0   # max seconds before full Roblox restart
 WEBHOOK_URL            = ""      # Discord webhook URL (set via GUI)
 
 # =========================
+# Strategy selection
+# =========================
+STRATEGY             = "cid_raid"   # "cid_raid" | "cid_act2"
+ACT2_TEAM            = 1
+ACT2_SKELE_WAIT      = 3.0
+ACT2_CONSISTENT_NUKE = False
+
+# =========================
 # Shared state dict (read by GUI tick loop)
 # =========================
 state = {

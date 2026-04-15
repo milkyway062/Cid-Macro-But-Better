@@ -1,3 +1,7 @@
+#### Update `0.8 - Beta`
+- re-did the GUI - Now way way cleaner and better to look at
+- Added Kahouii's strat, say thanks to them if its better than the orig
+
 #### Update `0.75-5`
 - Added total gems count to webhook
 
