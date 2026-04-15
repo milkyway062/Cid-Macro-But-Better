@@ -117,7 +117,7 @@ def _place_unit(unit: dict) -> None:
 
 def _quick_rts() -> None:
     """Return to spawn (Kouhaii's quick_rts sequence)."""
-    for x, y in [(232, 873), (1153, 503), (1217, 267)]:
+    for x, y in [(232, 743), (1153, 503), (1217, 267)]:
         _click(x, y, delay=0.1)
         time.sleep(0.2)
 
@@ -165,8 +165,7 @@ def _wait_start() -> bool:
     for _ in range(90):
         if state.SHUTDOWN:
             return False
-        if _img_exists("vote_start.png", region=(802, 211, 77, 37),
-                       confidence=0.7, grayscale=False):
+        if _img_exists("vote_start.png", confidence=0.6, grayscale=True):
             return True
         time.sleep(1.0)
     return False
@@ -427,9 +426,16 @@ def run_loop() -> None:
                 break
             continue
 
-        # Click replay to start / advance to next match
-        _click(*REPLAY_POS)
-        time.sleep(0.2)
+        # Click replay to advance to next match (not needed on first match)
+        if not first_match:
+            _click(*REPLAY_POS)
+            time.sleep(0.2)
+            logger.info("Act2: waiting for vote_start after replay")
+            if not _wait_start():
+                if state.SHUTDOWN:
+                    break
+                logger.warning("Act2: vote_start not detected after replay, proceeding anyway")
+            time.sleep(0.5)
 
         # First-match setup (once per session / after rejoin)
         if first_match:
