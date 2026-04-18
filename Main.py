@@ -274,16 +274,22 @@ def main_loop():
         except Exception:
             logger.exception("Error placing Sokora")
 
-        while pyautogui.pixelMatchesColor(*state.STOCK1, config.STOCK_COLOR, tolerance=40):
+        min_cycles = 2
+        cycle      = 0
+        while True:
             if state.SHUTDOWN or state._restart_run.is_set():
                 break
             if pyautogui.pixelMatchesColor(725 + state.dx, 169 + state.dy, (255, 255, 255), tolerance=30):
+                break
+            if cycle >= min_cycles and not detections.is_stock_available(state.STOCK1):
+                logger.info("STOCK1 gone — moving to Gohan loop")
                 break
             helpers.press("q")
             actions.select(state.SOKORA_POS)
             InputHandler.Click(*state.ABILITY1, delay=0.1)
             InputHandler.Click(*state.ICHIGO_POS, delay=0.1)
             time.sleep(0.4)
+            cycle += 1
 
         if state.SHUTDOWN:
             break
@@ -358,6 +364,9 @@ def main_loop():
         except Exception:
             logger.exception("Error closing unit manager")
 
+        InputHandler.Click(*state.ANTIGOHAN_ABILITY_CLOSE, 0.1)
+        time.sleep(0.1)
+
         actions.select(state.SOKORA_POS)
         helpers.press("x")
         try:
@@ -394,21 +403,27 @@ def main_loop():
             actions.cleanup_after_abort()
             continue
         logger.info("Activating Brook Ability2")
-        start_section = time.time()
         while not state.SHUTDOWN:
             if state._restart_run.is_set():
                 break
+            if pyautogui.pixelMatchesColor(725 + state.dx, 169 + state.dy, (255, 255, 255), tolerance=30):
+                logger.info("Match ended — stopping ability2 loop")
+                break
+            if detections.is_defeat():
+                logger.warning("Defeat detected — restarting match")
+                actions.restart_match_ingame()
+                state.USE_BROOK = False
+                break
             try:
-                if pyautogui.locateOnScreen(detections._img("endscreen.png"), grayscale=True, confidence=0.8):
-                    logger.info("End screen detected, stopping ability2 loop")
+                if pyautogui.locateOnScreen(
+                    detections._img("vote_start.png"), grayscale=True, confidence=0.6
+                ):
+                    logger.info("vote_start detected in ability2 loop — round over, breaking")
                     break
             except pyautogui.ImageNotFoundException:
                 pass
             except Exception:
-                traceback.print_exc()
-            if time.time() - start_section > 5:
-                logger.warning("Ability2 loop timeout")
-                break
+                pass
             InputHandler.Click(*state.ABILITY2, delay=0.1)
             time.sleep(0.12)
 
@@ -425,6 +440,7 @@ def main_loop():
         state.state["runs_since_rejoin"] += 1
         total_elapsed   = time.time() - state.state["run_start"]
         session_elapsed = time.time() - state.state["session_start"]
+        state.state["total_run_time"] += total_elapsed
         run_time_str    = time.strftime("%H:%M:%S", time.gmtime(total_elapsed))
         total_time_str  = time.strftime("%H:%M:%S", time.gmtime(session_elapsed))
 
@@ -432,7 +448,8 @@ def main_loop():
             Thread(
                 target=webhook.send_webhook,
                 args=(run_time_str, total_time_str, state.state["total_runs"],
-                      state.state["runs_since_rejoin"]),
+                      state.state["runs_since_rejoin"], session_elapsed,
+                      state.state["total_run_time"]),
                 daemon=True,
             ).start()
         except Exception:
@@ -487,6 +504,7 @@ def start() -> bool:
     state.state["runs_since_rejoin"] = 0
     state.state["session_start"]     = time.time()
     state.state["run_start"]         = 0.0
+    state.state["total_run_time"]    = 0.0
 
     Thread(target=watchdogs.disconnect_checker, daemon=True).start()
     Thread(target=watchdogs.popup_watcher,      daemon=True).start()

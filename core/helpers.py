@@ -10,13 +10,19 @@ logger = logging.getLogger(__name__)
 
 # Patch InputHandler.Click so all clicks go through a shared lock.
 # This runs once at import time; helpers is always imported first by all other modules.
-_original_click = InputHandler.Click
+_original_click  = InputHandler.Click
+_original_rclick = InputHandler.RightClick
 
 def _locked_click(x, y, delay):
     with state._click_lock:
         _original_click(x, y, delay)
 
-InputHandler.Click = _locked_click
+def _locked_rclick(x, y, delay):
+    with state._click_lock:
+        _original_rclick(x, y, delay)
+
+InputHandler.Click       = _locked_click
+InputHandler.RightClick  = _locked_rclick
 
 
 # ---------------------------------------------------------------------------
@@ -68,15 +74,18 @@ def _update_positions():
     state.WAVE_SKIP            = (616 + dx,  40 + dy)
     state.ABILITY1             = (333 + dx, 278 + dy)
     state.ABILITY2             = (333 + dx, 338 + dy)
-    state.BROOK_ABILITY_CLOSE  = (590 + dx, 183 + dy)
+    state.BROOK_ABILITY_CLOSE      = (590 + dx, 183 + dy)
+    state.ANTIGOHAN_ABILITY_CLOSE  = ( 50 + dx, 183 + dy)
     state.STOCK1               = (601 + dx,  41 + dy)
     state.STOCK2               = (356 + dx,  41 + dy)
     state.BOSS_ALIVE           = (310 + dx, 113 + dy)
     state.PASSIVE_MENU_PIXEL   = ( 35 + dx, 543 + dy)
     state.RESTART_SETTINGS_BTN = ( 26 + dx, 610 + dy)
     state.RESTART_MATCH_BTN    = (704 + dx, 292 + dy)
-    state.RESTART_YES_BTN      = (351 + dx, 367 + dy)
-    state.RESTART_OK_BTN       = (407 + dx, 360 + dy)
+    state.RESTART_YES_BTN          = (351 + dx, 367 + dy)
+    state.RESTART_OK_BTN           = (407 + dx, 360 + dy)
+    state.RESTART_SETTINGS_CLOSE   = (config.RESTART_SETTINGS_CLOSE_OFFSET[0] + dx,
+                                       config.RESTART_SETTINGS_CLOSE_OFFSET[1] + dy)
 
 
 def extract_ps_link_code(value: str) -> str:

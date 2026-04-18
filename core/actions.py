@@ -83,6 +83,9 @@ def brook_buff():
     while True:
         if state.SHUTDOWN:
             return
+        if state.USE_BROOK:
+            logger.info("brook_buff: boss died — exiting buff early")
+            break
         try:
             ability_open = pyautogui.pixelMatchesColor(
                 *state.BROOK_ABILITY_CLOSE, (255, 255, 255), tolerance=30)
@@ -165,6 +168,10 @@ def restart_match_ingame():
         else:
             logger.warning("restart_confirmation not detected; falling back to hardcoded Ok")
             InputHandler.Click(*state.RESTART_OK_BTN, delay=0.3)
+
+        time.sleep(0.2)
+        InputHandler.Click(*state.RESTART_SETTINGS_CLOSE, delay=0.1)
+        logger.info("Settings panel closed after restart")
 
     except Exception:
         logger.exception("restart_match_ingame failed")

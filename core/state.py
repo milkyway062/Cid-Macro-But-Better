@@ -36,6 +36,7 @@ state = {
     "runs_since_rejoin": 0,
     "session_start":     0.0,
     "run_start":         0.0,
+    "total_run_time":    0.0,
     "run_timeout":       90.0,
     "running":           False,
     "last_webhook_ok":   None,
@@ -68,20 +69,22 @@ _macro_thread      = None
 # Runtime-computed position globals
 # All start as (0, 0) and are populated by helpers._update_positions()
 # =========================
-BROOK_POS           = (0, 0)
-ICHIGO_POS          = (0, 0)
-SOKORA_POS          = (0, 0)
-NEWSMAN_P1          = (0, 0)
-UNIT_CLOSE          = (0, 0)
-WAVE_SKIP           = (0, 0)
-ABILITY1            = (0, 0)
-ABILITY2            = (0, 0)
-BROOK_ABILITY_CLOSE = (0, 0)
-STOCK1              = (0, 0)
-STOCK2              = (0, 0)
-BOSS_ALIVE          = (0, 0)
-PASSIVE_MENU_PIXEL  = (0, 0)
-RESTART_SETTINGS_BTN = (0, 0)
-RESTART_MATCH_BTN   = (0, 0)
-RESTART_YES_BTN     = (0, 0)
-RESTART_OK_BTN      = (0, 0)
+BROOK_POS                = (0, 0)
+ICHIGO_POS               = (0, 0)
+SOKORA_POS               = (0, 0)
+NEWSMAN_P1               = (0, 0)
+UNIT_CLOSE               = (0, 0)
+WAVE_SKIP                = (0, 0)
+ABILITY1                 = (0, 0)
+ABILITY2                 = (0, 0)
+BROOK_ABILITY_CLOSE      = (0, 0)
+ANTIGOHAN_ABILITY_CLOSE  = (0, 0)
+STOCK1                   = (0, 0)
+STOCK2                   = (0, 0)
+BOSS_ALIVE               = (0, 0)
+PASSIVE_MENU_PIXEL       = (0, 0)
+RESTART_SETTINGS_BTN     = (0, 0)
+RESTART_MATCH_BTN        = (0, 0)
+RESTART_YES_BTN          = (0, 0)
+RESTART_OK_BTN           = (0, 0)
+RESTART_SETTINGS_CLOSE   = (0, 0)

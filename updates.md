@@ -1,3 +1,8 @@
+#### Update `0.85 - Post-Beta`
+- Kouhaii's strat still doesnt work, however the main one does
+- Updated for AV update 12.0
+- I lowk forgot what else
+
 #### Update `0.8 - Beta`
 - re-did the GUI - Now way way cleaner and better to look at
 - Added Kahouii's strat, say thanks to them if its better than the orig

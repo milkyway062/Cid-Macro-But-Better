@@ -4,6 +4,7 @@ import os
 import pyautogui
 
 import state
+import config
 import InputHandler
 
 logger = logging.getLogger(__name__)
@@ -32,6 +33,42 @@ def _wait_for_image(name: str, timeout: float = 5.0, confidence: float = 0.7) ->
         time.sleep(0.1)
     logger.debug("_wait_for_image(%s) timed out after %.1fs", name, timeout)
     return None
+
+
+def is_victory() -> bool:
+    """Pixel-based victory screen check."""
+    try:
+        return pyautogui.pixelMatchesColor(
+            config.RESULT_POS_OFFSET[0] + state.dx,
+            config.RESULT_POS_OFFSET[1] + state.dy,
+            config.RESULT_WIN_COLOR,
+            tolerance=30,
+        )
+    except Exception:
+        return False
+
+
+def is_defeat() -> bool:
+    """Pixel-based defeat screen check."""
+    try:
+        return pyautogui.pixelMatchesColor(
+            config.RESULT_POS_OFFSET[0] + state.dx,
+            config.RESULT_POS_OFFSET[1] + state.dy,
+            config.RESULT_LOSE_COLOR,
+            tolerance=30,
+        )
+    except Exception:
+        return False
+
+
+def is_stock_available(pos: tuple) -> bool:
+    """Return True if a stock slot is present (green = available, red = on cooldown)."""
+    try:
+        green = pyautogui.pixelMatchesColor(*pos, expectedRGBColor=config.STOCK_COLOR, tolerance=50)
+        red   = pyautogui.pixelMatchesColor(*pos, expectedRGBColor=config.STOCK_RED,   tolerance=80)
+        return green or red
+    except Exception:
+        return False
 
 
 def _check_match_end() -> bool:

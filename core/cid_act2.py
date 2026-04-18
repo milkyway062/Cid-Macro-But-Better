@@ -106,12 +106,10 @@ def _tap(key: str) -> None:
 
 def _place_unit(unit: dict) -> None:
     pos = _p(*unit["pos"])
-    InputHandler.MoveTo(*pos)
-    time.sleep(0.02)
     InputHandler.KeyDown(config.KEYMAP[unit["key"]])
-    time.sleep(0.02)
+    time.sleep(0.05)
     InputHandler.KeyUp(config.KEYMAP[unit["key"]])
-    time.sleep(0.06)
+    time.sleep(0.05)
     InputHandler.Click(*pos, delay=0.1)
 
 
@@ -149,7 +147,7 @@ def spam_chord_for_duration(duration: float = 2.0) -> None:
 # ── Detection helpers ─────────────────────────────────────────────────────────
 def _boss_hp_visible() -> bool:
     return _img_exists("Cid_Health.png", region=(555, 235, 125, 27),
-                       confidence=0.7, grayscale=False)
+                       confidence=0.6, grayscale=True)
 
 
 def _is_win() -> bool:
@@ -254,7 +252,7 @@ def _run_team1() -> None:
 
     # Wait for cooldown pixel to clear
     while _pxl(765, 791, (2, 0, 0)):
-        if state.SHUTDOWN:
+        if state.SHUTDOWN or state._restart_run.is_set():
             return
         time.sleep(0.1)
 
@@ -270,7 +268,7 @@ def _run_team1() -> None:
     # Stock 1 loop
     temp = 0
     while _pxl(975, 140, (103, 219, 81)):
-        if state.SHUTDOWN:
+        if state.SHUTDOWN or state._restart_run.is_set():
             return
         if temp >= 1:
             _click(*sakura["pos"])
@@ -283,7 +281,7 @@ def _run_team1() -> None:
 
     # Stock 2 loop
     while _pxl(830, 140, (103, 219, 81)):
-        if state.SHUTDOWN:
+        if state.SHUTDOWN or state._restart_run.is_set():
             return
         _click(*sakura["pos"])
         time.sleep(0.1)
@@ -309,7 +307,7 @@ def _run_team1() -> None:
     # Wait for boss HP bar to disappear (boss dead)
     temp_sec = 0.0
     while _boss_hp_visible():
-        if state.SHUTDOWN:
+        if state.SHUTDOWN or state._restart_run.is_set():
             return
         time.sleep(0.1)
         temp_sec += 0.1
@@ -323,7 +321,7 @@ def _run_team1() -> None:
     _click(*skele["pos"])
     if state.ACT2_CONSISTENT_NUKE:
         while not _boss_hp_visible():
-            if state.SHUTDOWN:
+            if state.SHUTDOWN or state._restart_run.is_set():
                 return
             time.sleep(0.1)
     else:
@@ -373,7 +371,7 @@ def _run_team2() -> None:
         time.sleep(0.2)
 
     while _boss_hp_visible():
-        if state.SHUTDOWN:
+        if state.SHUTDOWN or state._restart_run.is_set():
             return
         time.sleep(0.1)
     time.sleep(0.2)
@@ -381,7 +379,7 @@ def _run_team2() -> None:
 
     # Wait for Alucard hotbar slot to become available (slot 4 = x=800, y=826)
     while _pxl(800, 826, (35, 35, 35)):
-        if state.SHUTDOWN:
+        if state.SHUTDOWN or state._restart_run.is_set():
             return
         time.sleep(0.1)
 
@@ -408,9 +406,19 @@ def run_loop() -> None:
     wins               = 0
     losses             = 0
 
-    state.state["session_start"] = time.time()
+    # Navigate from lobby to Ruined City Act 2 on startup if needed
+    if detections.is_in_lobby() or detections._daily_rewards_visible():
+        logger.info("Act2: in lobby on startup — navigating to Ruined City Act 2")
+        lobby.prepare_lobby()
+        if state.SHUTDOWN:
+            return
+        if not lobby.lobby_path_cid_raid():
+            logger.error("Act2: failed to navigate to Ruined City Act 2 — aborting")
+            return
 
     while not state.SHUTDOWN:
+        state._restart_run.clear()
+        state._match_active.clear()
         state.state["run_start"] = time.time()
         logger.info("==== Act2 new run (runs_since_rejoin=%d) ====", runs_since_rejoin)
 
@@ -424,6 +432,11 @@ def run_loop() -> None:
             lobby._do_roblox_rejoin("Act2 periodic rejoin")
             if state.SHUTDOWN:
                 break
+            lobby.prepare_lobby()
+            if state.SHUTDOWN:
+                break
+            if not lobby.lobby_path_cid_raid():
+                logger.warning("Act2: lobby nav failed after rejoin — retrying next iteration")
             continue
 
         # Click replay to advance to next match (not needed on first match)
@@ -436,6 +449,12 @@ def run_loop() -> None:
                     break
                 logger.warning("Act2: vote_start not detected after replay, proceeding anyway")
             time.sleep(0.5)
+            # Wait for map to fully load before placing units
+            logger.info("Act2: waiting for map load (~8 s)")
+            if not helpers._sleep(8.0):
+                break
+            state._match_active.set()
+            logger.info("Act2: match active")
 
         # First-match setup (once per session / after rejoin)
         if first_match:
@@ -453,7 +472,15 @@ def run_loop() -> None:
                 time.sleep(2.0)
             _click(*VOTE_START_POS)
             first_match = False
-            time.sleep(0.2)
+            # Wait for map to fully load before placing units
+            logger.info("Act2: waiting for map load (~8 s)")
+            if not helpers._sleep(8.0):
+                break
+            state._match_active.set()
+            logger.info("Act2: match active")
+
+        if state._restart_run.is_set():
+            continue
 
         # Execute team sequence
         if state.ACT2_TEAM == 1:
@@ -463,6 +490,11 @@ def run_loop() -> None:
 
         if state.SHUTDOWN:
             break
+
+        state._match_active.clear()
+
+        if state._restart_run.is_set():
+            continue
 
         # Wait for match end
         result = _wait_end()
