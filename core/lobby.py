@@ -148,7 +148,7 @@ def prepare_lobby() -> bool:
 
     if detections._daily_rewards_visible():
         logger.info("prepare_lobby: closing daily rewards")
-        InputHandler.Click(653 + state.dx, 193 + state.dy, delay=0.1)
+        InputHandler.Click(654 + state.dx, 187 + state.dy, delay=0.1)
         if not helpers._sleep(0.5):
             return False
 

@@ -23,7 +23,6 @@ def place(unit: int, pos: tuple, max_retries=4, per_attempt_timeout=1.2) -> bool
 
         try:
             helpers.press(key)
-            time.sleep(0.06)
             InputHandler.Click(*pos, delay=0.1)
         except Exception:
             logger.exception("Error sending input for place(%s) attempt %d", unit, attempt)

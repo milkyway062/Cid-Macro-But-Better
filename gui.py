@@ -235,6 +235,12 @@ class MacroGUI:
         )
         self._stop_btn.pack(side="left")
 
+        self._restart_btn = self._btn(
+            row, "↺ Restart", self._on_restart,
+            AMBER, AMBER_A, font=FONT_BODY,
+        )
+        self._restart_btn.pack(side="left", padx=(8, 0))
+
         # Hotkey hint — right-aligned
         tk.Label(row, text="F1 / F3", bg=CARD, fg=FG_DIM,
                  font=FONT_SMALL).pack(side="right", padx=4)
@@ -495,6 +501,19 @@ class MacroGUI:
         self._stop_btn.config(state="disabled")
         self._set_status("stopping\u2026", _DOT_STOP)
         self._stopping = True
+
+    def _on_restart(self):
+        self._save()
+        Main.stop()
+        self._restart_btn.config(state="disabled")
+        self._set_status("restarting\u2026", _DOT_STOP)
+        self.root.after(400, self._do_restart)
+
+    def _do_restart(self):
+        self.root.destroy()
+        import subprocess
+        subprocess.Popen([sys.executable] + sys.argv)
+        os._exit(0)
 
     def _set_status(self, text: str, dot_color: str):
         self._status_var.set(text)

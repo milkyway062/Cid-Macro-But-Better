@@ -98,12 +98,12 @@ def is_in_lobby() -> bool:
 
 
 def _daily_rewards_visible() -> bool:
-    """Return True if the daily rewards popup is present (white pixel at 653,193)."""
+    """Return True if the daily rewards popup is present (white pixel at 654,187)."""
     if not state.rb_window:
         return False
     try:
-        return pyautogui.pixelMatchesColor(653 + state.dx, 193 + state.dy,
-                                           (255, 255, 255), tolerance=10)
+        return pyautogui.pixelMatchesColor(654 + state.dx, 187 + state.dy,
+                                           (255, 255, 255), tolerance=5)
     except Exception:
         return False
 

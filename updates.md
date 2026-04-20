@@ -1,3 +1,7 @@
+#### Update `0.9`
+- Kouhaii's strat still doesnt work, however the main one does
+- I did too much to remember, but changed a lot, webhooks changed, made it faster i hope, still working on the speed. 
+
 #### Update `0.85 - Post-Beta`
 - Kouhaii's strat still doesnt work, however the main one does
 - Updated for AV update 12.0

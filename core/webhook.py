@@ -10,6 +10,18 @@ import state
 logger = logging.getLogger(__name__)
 
 
+def _fmt_duration(seconds: float) -> str:
+    s = int(seconds)
+    days = s // 86400
+    rem  = s % 86400
+    h    = rem // 3600
+    m    = (rem % 3600) // 60
+    sec  = rem % 60
+    if days > 0:
+        return f"{days}d {h:02d}:{m:02d}:{sec:02d}"
+    return f"{h:02d}:{m:02d}:{sec:02d}"
+
+
 def send_webhook(run_time: str, total_time: str, total_runs: int,
                  runs_since_rejoin: int, session_elapsed_seconds: float = 0.0,
                  total_run_time: float = 0.0, retries: int = 3):
@@ -20,23 +32,26 @@ def send_webhook(run_time: str, total_time: str, total_runs: int,
         state.LAST_WEBHOOK_OK = False
         return False
 
-    total_gems    = total_runs * 150
-    run_hours     = total_run_time / 3600 if total_run_time > 0 else 0
-    gems_per_hour = int(total_gems / run_hours) if run_hours > 0 else 0
-    avg_secs      = total_run_time / total_runs if total_runs > 0 else 0
-    avg_clear_str = time.strftime("%M:%S", time.gmtime(avg_secs))
+    total_gems      = total_runs * 150
+    session_hours   = session_elapsed_seconds / 3600 if session_elapsed_seconds > 0 else 0
+    gems_per_hour   = int(total_gems / session_hours) if session_hours > 0 else 0
+    avg_secs        = total_run_time / total_runs if total_runs > 0 else 0
+    avg_mins        = int(avg_secs // 60)
+    avg_secs_rem    = int(avg_secs % 60)
+    avg_clear_str   = f"{avg_mins}:{avg_secs_rem:02d}"
+    session_str     = _fmt_duration(session_elapsed_seconds)
 
     embed = {
         "title":     "Loxer's Automation",
         "color":     3447003,
         "fields": [
-            {"name": "🔁 Total Runs",         "value": str(total_runs),        "inline": True},
             {"name": "🕒 Run Time",            "value": run_time,               "inline": True},
-            {"name": "⏱️ Total Time",          "value": total_time,             "inline": True},
-            {"name": "📊 Runs Since Rejoin",   "value": str(runs_since_rejoin), "inline": True},
-            {"name": "💎 Total Gems Earned",   "value": str(total_gems),        "inline": True},
-            {"name": "⚡ Gems / Hour",         "value": str(gems_per_hour),     "inline": True},
             {"name": "⏱️ Avg Clear Time",      "value": avg_clear_str,          "inline": True},
+            {"name": "🗓️ Total Session Time",  "value": session_str,            "inline": True},
+            {"name": "🔁 Total Runs",          "value": str(total_runs),        "inline": True},
+            {"name": "📊 Runs Since Rejoin",   "value": str(runs_since_rejoin), "inline": True},
+            {"name": "💎 Total Gems",          "value": str(total_gems),        "inline": True},
+            {"name": "⚡ Gems / Hour",         "value": str(gems_per_hour),     "inline": True},
         ],
         "thumbnail": {"url": "https://media1.tenor.com/m/1VbR3kVavicAAAAC/gin.gif"},
         "footer":    {"text": f"Loxer's Automation | Run time: {run_time}"},

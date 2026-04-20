@@ -70,23 +70,6 @@ def main_loop():
             if state._restarting.is_set():
                 time.sleep(0.1)
                 continue
-            # Cancel popup takes priority — dismiss without aborting
-            try:
-                cancel_loc = pyautogui.locateOnScreen(
-                    image=detections._img("ability_in_use.png"),
-                    grayscale=True,
-                    confidence=0.6,
-                )
-                if cancel_loc:
-                    cx, cy = pyautogui.center(cancel_loc)
-                    InputHandler.Click(cx, cy, delay=0.1)
-                    logger.info("Cancel popup dismissed during vote_start wait")
-                    time.sleep(0.1)
-                    continue
-            except pyautogui.ImageNotFoundException:
-                pass
-            except Exception:
-                pass
             try:
                 location = pyautogui.locateOnScreen(
                     image=detections._img("vote_start.png"),
@@ -94,21 +77,6 @@ def main_loop():
                     confidence=0.6,
                 )
                 if location:
-                    # Final safety check: don't click vote_start if cancel popup is visible
-                    try:
-                        cancel_check = pyautogui.locateOnScreen(
-                            image=detections._img("ability_in_use.png"),
-                            grayscale=True,
-                            confidence=0.6,
-                        )
-                        if cancel_check:
-                            cx2, cy2 = pyautogui.center(cancel_check)
-                            InputHandler.Click(cx2, cy2, delay=0.1)
-                            logger.info("Cancel popup dismissed — delaying vote_start click")
-                            time.sleep(0.1)
-                            continue
-                    except Exception:
-                        pass
                     cx, cy = pyautogui.center(location)
                     cx += 124  # button is 124px right of image center
                     InputHandler.Click(cx, cy, delay=0.1)
@@ -139,18 +107,6 @@ def main_loop():
                 break
             if pyautogui.pixelMatchesColor(725 + state.dx, 169 + state.dy, (255, 255, 255), tolerance=30):
                 InputHandler.Click(374 + state.dx, 474 + state.dy, 0.1)
-            try:
-                cancel_loc = pyautogui.locateOnScreen(
-                    image=detections._img("ability_in_use.png"),
-                    grayscale=True,
-                    confidence=0.6,
-                )
-                if cancel_loc:
-                    cx, cy = pyautogui.center(cancel_loc)
-                    InputHandler.Click(cx, cy, delay=0.1)
-                    logger.info("Cancel popup dismissed during spawn wait")
-            except Exception:
-                pass
             time.sleep(0.1)
 
         if state.SHUTDOWN:
@@ -164,18 +120,6 @@ def main_loop():
             if state.SHUTDOWN or state._restart_run.is_set():
                 break
             InputHandler.Click(472 + state.dx, 127 + state.dy, 0.1)
-            try:
-                cancel_loc = pyautogui.locateOnScreen(
-                    image=detections._img("ability_in_use.png"),
-                    grayscale=True,
-                    confidence=0.6,
-                )
-                if cancel_loc:
-                    cx, cy = pyautogui.center(cancel_loc)
-                    InputHandler.Click(cx, cy, delay=0.1)
-                    logger.info("Cancel popup dismissed during spawn confirm wait")
-            except Exception:
-                pass
             time.sleep(0.3)
 
         if state.SHUTDOWN:
@@ -241,32 +185,8 @@ def main_loop():
                 break
             time.sleep(0.1)
 
-        NEWSMAN_RETRY_DELAY = 0.6
-        newsman_placed  = False
-        newsman_attempts = 0
-        while not state.SHUTDOWN and not newsman_placed and not state._restart_run.is_set():
-            newsman_attempts += 1
-            logger.info("Attempting to place Newsman (attempt %d)", newsman_attempts)
-            try:
-                actions.place(5, state.NEWSMAN_P1)
-            except Exception:
-                logger.exception("Unexpected error while calling place() for Newsman")
-
-            time.sleep(0.25)
-
-            try:
-                if (pyautogui.pixelMatchesColor(*state.UNIT_CLOSE, expectedRGBColor=(255, 255, 255), tolerance=30)
-                        or pyautogui.pixelMatchesColor(725 + state.dx, 169 + state.dy, (255, 255, 255), tolerance=30)):
-                    logger.info("Newsman placement confirmed")
-                    newsman_placed = True
-                    break
-            except Exception:
-                traceback.print_exc()
-
-            logger.warning("Newsman placement not confirmed; retrying in %.2fs", NEWSMAN_RETRY_DELAY)
-            time.sleep(NEWSMAN_RETRY_DELAY)
-
-        time.sleep(0.2)
+        logger.info("Placing Newsman")
+        actions.place(5, state.NEWSMAN_P1)
 
         try:
             if not actions.place(3, state.SOKORA_POS):
@@ -425,7 +345,7 @@ def main_loop():
             except Exception:
                 pass
             InputHandler.Click(*state.ABILITY2, delay=0.1)
-            time.sleep(0.12)
+            time.sleep(0.1)
 
         try:
             if pyautogui.pixelMatchesColor(453 + state.dx, 293 + state.dy,
